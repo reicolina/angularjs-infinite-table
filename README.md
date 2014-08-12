@@ -1,12 +1,16 @@
 # angularjs-infinite-table
 
-This project is a sortable HTML table with infinite scrolling implemented with Angular JS
+This project is a sortable HTML table with infinite scrolling implemented with Angular JS. The data I used to populate this table is taken from [Reddit's public API](http://www.reddit.com/dev/api).
 
 ## Getting Started
 
-See angularjs directive implementation in app/index.html
+See angularjs directive implementation in app/index.html or browse directly to http://reinaldo13.github.io/angularjs-infinite-table/app/ to see the table in action!
 
-### Supported Browsers
+## Dependencies
+
+This projects uses [ngInfiniteScroll](https://binarymuse.github.io/ngInfiniteScroll/index.html) and implements a modified version of [angular-table](http://angulartable.com/)
+
+## Supported Browsers
 
 All modern browsers are supported:
 
