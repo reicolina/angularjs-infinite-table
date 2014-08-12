@@ -30,7 +30,7 @@ angular.module('myApp.directives', [])
                 };
             },
             scope: {
-                // model: '=',
+                tableModel: '='
                 // filterQueryModel: '='
             }
         };

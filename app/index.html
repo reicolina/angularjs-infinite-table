@@ -10,7 +10,7 @@
 
 <div ng-app='myApp' ng-controller='MyCtrl1'>
     <!-- Search: <input type="text" ng-model="filterQuery" /> -->
-    <angular-table default-sort-column="score" style="width:800px; height:400px; overflow:auto;">
+    <angular-table table-model="data" default-sort-column="score" style="width:800px; height:400px; overflow:auto;">
         <header-row>
             <header-column sortable="true" sort-field-name="score">
               Score

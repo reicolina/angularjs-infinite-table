@@ -148,7 +148,7 @@ angular.module('myApp.services', [])
 
                 // add the ng-repeat and row selection click handler to each row
                 rowTemplate = rowTemplate.replace('<tr',
-                    '<tr ng-repeat="row in reddit.items | filter:filterQuery | orderBy:SortState.sortExpression:SortState.sortDirectionToColumnMap[SortState.sortExpression]" ' +
+                    '<tr ng-repeat="row in data.items | filter:filterQuery | orderBy:SortState.sortExpression:SortState.sortDirectionToColumnMap[SortState.sortExpression]" ' +
                         selectedBackgroundColor + ngClick);
             }
 
