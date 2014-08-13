@@ -47,14 +47,12 @@ angular.module('myApp.services', [])
     // slightly modified version of:
     // angular-table
     // http://angulartable.com/
-    .service('JqLiteExtension', ['$window', 'Instrumentation', function($window, Instrumentation) {
+    .service('JqLiteExtension', ['$window', function($window) {
         var self = this;
 
         // TODO: make this work with IE8<, android 3<, and ios4<: http://caniuse.com/getcomputedstyle
         self.getComputedPropertyAsFloat = function(rawDomElement, property) {
             var computedValueAsString = $window.getComputedStyle(rawDomElement).getPropertyValue(property).replace('px', '');
-
-            Instrumentation.log('JqLiteExtension', 'className: ' + rawDomElement.className + '\n' + 'property: ' + property, computedValueAsString);
             return parseFloat(computedValueAsString);
         };
 
@@ -71,7 +69,7 @@ angular.module('myApp.services', [])
     // slightly modified version of:
     // angular-table
     // http://angulartable.com/
-    .service('ManualCompiler', ['TemplateStaticState', function(TemplateStaticState) {
+    .service('ManualCompiler', [function() {
         var self = this;
 
         self.compileRow = function(tElement, tAttrs, isHeader) {
@@ -130,26 +128,9 @@ angular.module('myApp.services', [])
                 rowTemplate = rowTemplate.replace(/sort-arrow-descending/g, 'div');
                 rowTemplate = rowTemplate.replace(/sort-arrow-ascending/g, 'div');
             } else {
-                var selectedBackgroundColor = '';
-                var ngClick = '';
-
-                TemplateStaticState.selectedRowColor = tAttrs.selectedColor;
-                TemplateStaticState.evenRowColor = tAttrs.evenColor;
-                TemplateStaticState.oddRowColor = tAttrs.oddColor;
-
-                if(typeof(tAttrs.selectedColor) !== 'undefined' || typeof(tAttrs.evenColor) !== 'undefined' || typeof(tAttrs.oddColor) !== 'undefined' ) {
-                    selectedBackgroundColor = 'ng-style="{ backgroundColor: getRowColor($index, row) }"';
-                }
-
-                if(typeof(tAttrs.onSelected) !== 'undefined') {
-                    ngClick = ' ng-click="handleClick(row, \'' +
-                        tAttrs.onSelected + '\', \'' + tAttrs.selectedColor + '\')" '
-                }
-
-                // add the ng-repeat and row selection click handler to each row
+                // add the ng-repeat
                 rowTemplate = rowTemplate.replace('<tr',
-                    '<tr ng-repeat="row in data.items | filter:filterQuery | orderBy:SortState.sortExpression:SortState.sortDirectionToColumnMap[SortState.sortExpression]" ' +
-                        selectedBackgroundColor + ngClick);
+                    '<tr ng-repeat="row in data.items | orderBy:SortState.sortExpression:SortState.sortDirectionToColumnMap[SortState.sortExpression]"');
             }
 
             // wrap our rows in a table, and a container div.  the container div will manage the scrolling.
@@ -198,31 +179,6 @@ angular.module('myApp.services', [])
     // slightly modified version of:
     // angular-table
     // http://angulartable.com/
-    .service('TemplateStaticState', function() {
-        var self = this;
-
-        // store selected, even and odd row background colors
-        self.selectedRowColor = '';
-        self.evenRowColor = '';
-        self.oddRowColor = '';
-
-        return self;
-    })
-    // slightly modified version of:
-    // angular-table
-    // http://angulartable.com/
-    .service('RowState', function() {
-        var self = this;
-
-        // store a reference to the previously selected row so we can access it without looking it up from the bound model
-        self.previouslySelectedRow = {};
-        self.previouslySelectedRowColor = '';
-
-        return self;
-    })
-    // slightly modified version of:
-    // angular-table
-    // http://angulartable.com/
     .service('SortState', function() {
         var self = this;
 
@@ -233,20 +189,4 @@ angular.module('myApp.services', [])
         self.sortDirectionToColumnMap = {};
 
         return self;
-    })
-    // slightly modified version of:
-    // angular-table
-    // http://angulartable.com/
-    .service('Instrumentation', ['TemplateStaticState', '$log', function(TemplateStaticState, $log) {
-        var self = this;
-        self.log = function(source, event, value) {
-            if(TemplateStaticState.instrumentationEnabled) {
-                $log.log('Source: ' + source);
-                $log.log('Event: ' + event);
-                $log.log('Value: ' + value);
-                $log.log('------------------------\n');
-            }
-        };
-
-        return self;
-    }]);
+    });

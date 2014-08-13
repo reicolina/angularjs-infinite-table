@@ -6,8 +6,8 @@ angular.module('myApp.directives', [])
     // slightly modified version of:
     // angular-table
     // http://angulartable.com/
-    .directive('angularTable', ['SortState', 'TemplateStaticState',
-        function(SortState, TemplateStaticState) {
+    .directive('angularTable', ['SortState',
+        function(SortState) {
         return {
             // only support elements for now to simplify the manual transclusion and replace logic.
             restrict: 'E',
@@ -15,7 +15,6 @@ angular.module('myApp.directives', [])
             // see bug: https://github.com/angular/angular.js/issues/1459
             compile: function (tElement, tAttrs) {
                 SortState.sortExpression = tAttrs.defaultSortColumn;
-                TemplateStaticState.instrumentationEnabled = tAttrs.instrumentationEnabled;
 
                 // find whatever classes were passed into the angular-table, and merge them with the built in classes for the container div
                 tElement.addClass('angularTableContainer');
@@ -31,15 +30,14 @@ angular.module('myApp.directives', [])
             },
             scope: {
                 tableModel: '='
-                // filterQueryModel: '='
             }
         };
     }])
     // slightly modified version of:
     // angular-table
     // http://angulartable.com/
-    .directive('headerRow', ['ManualCompiler', 'ScrollingContainerHeightState', 'JqLiteExtension', 'SortState', 'ResizeHeightEvent', 'ResizeWidthEvent', 'Instrumentation',
-        function(ManualCompiler, ScrollingContainerHeightState, JqLiteExtension, SortState, ResizeHeightEvent, ResizeWidthEvent, Instrumentation) {
+    .directive('headerRow', ['ManualCompiler', 'ScrollingContainerHeightState', 'JqLiteExtension', 'SortState', 'ResizeHeightEvent', 'ResizeWidthEvent',
+        function(ManualCompiler, ScrollingContainerHeightState, JqLiteExtension, SortState, ResizeHeightEvent, ResizeWidthEvent) {
         return {
             // only support elements for now to simplify the manual transclusion and replace logic.
             restrict: 'E',
@@ -71,7 +69,6 @@ angular.module('myApp.directives', [])
                         var scrollingContainerComputedWidth = JqLiteExtension.getComputedWidthAsFloat(iElement.next()[0]);
 
                         iElement.css('width', scrollingContainerComputedWidth + 'px');
-                        Instrumentation.log('headerRow', 'header width set', scrollingContainerComputedWidth + 'px');
                     }, true);
                 };
             }
@@ -80,49 +77,19 @@ angular.module('myApp.directives', [])
     // slightly modified version of:
     // angular-table
     // http://angulartable.com/
-    .directive('row', ['ManualCompiler', 'ResizeHeightEvent', '$window', 'Debounce', 'TemplateStaticState', 'RowState', 'SortState',
-        'ScrollingContainerHeightState', 'JqLiteExtension', 'Instrumentation', 'ResizeWidthEvent', '$compile',
-        function(ManualCompiler, ResizeHeightEvent, $window, Debounce, TemplateStaticState, RowState, SortState, ScrollingContainerHeightState,
-            JqLiteExtension, Instrumentation, ResizeWidthEvent, $compile) {
+    .directive('row', ['ManualCompiler', 'ResizeHeightEvent', '$window', 'Debounce', 'SortState',
+        'ScrollingContainerHeightState', 'JqLiteExtension', 'ResizeWidthEvent', '$compile',
+        function(ManualCompiler, ResizeHeightEvent, $window, Debounce, SortState, ScrollingContainerHeightState,
+            JqLiteExtension, ResizeWidthEvent, $compile) {
         return {
             // only support elements for now to simplify the manual transclusion and replace logic.
             restrict: 'E',
             controller: ['$scope', function($scope) {
                 $scope.sortExpression = SortState.sortExpression;
-
-                $scope.handleClick = function(row, parentScopeClickHandler, selectedRowBackgroundColor) {
-                    var clickHandlerFunctionName = parentScopeClickHandler.replace('(row)', '');
-
-                    if(selectedRowBackgroundColor !== 'undefined') {
-                        RowState.previouslySelectedRow.rowSelected = false;
-
-                        row.rowSelected = true;
-
-                        RowState.previouslySelectedRow = row;
-                    }
-
-                    if(clickHandlerFunctionName !== 'undefined') {
-                        $scope.$parent[clickHandlerFunctionName](row);
-                    }
-                };
-
-                $scope.getRowColor = function(index, row) {
-                    if(row.rowSelected) {
-                        return TemplateStaticState.selectedRowColor;
-                    } else {
-                        if(index % 2 === 0) {
-                            return TemplateStaticState.evenRowColor;
-                        } else {
-                            return TemplateStaticState.oddRowColor;
-                        }
-                    }
-                };
             }],
             // manually transclude and replace the template to work around not being able to have a template with td or tr as a root element
             // see bug: https://github.com/angular/angular.js/issues/1459
             compile: function (tElement, tAttrs) {
-                RowState.rowSelectedBackgroundColor = tAttrs.selectedColor;
-
                 ManualCompiler.compileRow(tElement, tAttrs, false);
 
                 // return a linking function
@@ -144,7 +111,6 @@ angular.module('myApp.directives', [])
                             // flip the booleans to trigger the watches
                             ResizeHeightEvent.fireTrigger = !ResizeHeightEvent.fireTrigger;
                             ResizeWidthEvent.fireTrigger = !ResizeWidthEvent.fireTrigger;
-                            Instrumentation.log('row', 'debounced window resize triggered');
                         });
                     }, 50));
 
@@ -157,20 +123,7 @@ angular.module('myApp.directives', [])
                         var outerContainerComputedHeight = getHeaderComputedHeight();
                         var headerComputedHeight = getScrollingContainerComputedHeight()
                         var newScrollingContainerHeight = outerContainerComputedHeight - headerComputedHeight;
-
-                        if(isNaN(headerComputedHeight)) {
-                            Instrumentation.log('row', 'header computed height was NaN');
-                        }
-
-                        if(isNaN(outerContainerComputedHeight)) {
-                            Instrumentation.log('row', 'outer container computed height was NaN');
-                        }
-
                         iElement.css('height', newScrollingContainerHeight + 'px');
-                        Instrumentation.log('row', 'scrolling container height set',
-                            'outerContainerComputedHeight: ' + outerContainerComputedHeight + '\n' +
-                            'headerComputedHeight: ' + headerComputedHeight + '\n' +
-                            'newScrollingContainerHeight: ' + newScrollingContainerHeight);
                     }, true);
 
                     // scroll to top when sort applied
@@ -179,13 +132,6 @@ angular.module('myApp.directives', [])
                     scope.$watch('SortState', function() {
                         iElement[0].scrollTop = 0;
                     }, true);
-
-                    // check for scrollbars and adjust the header table width, and scrolling table height as needed when the number of bound rows changes
-                    // scope.$watch('model', function(newValue, oldValue) {
-                    //     // flip the booleans to trigger the watches
-                    //     ResizeHeightEvent.fireTrigger = !ResizeHeightEvent.fireTrigger;
-                    //     ResizeWidthEvent.fireTrigger = !ResizeWidthEvent.fireTrigger;
-                    // }, true);
                 };
             }
         };
