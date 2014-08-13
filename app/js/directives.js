@@ -20,7 +20,7 @@ angular.module('myApp.directives', [])
                 // find whatever classes were passed into the angular-table, and merge them with the built in classes for the container div
                 tElement.addClass('angularTableContainer');
 
-                var rowTemplate = tElement[0].outerHTML.replace('<angular-table', '<div');
+                var rowTemplate = tElement[0].outerHTML.replace('<angular-table', '<div class="angularTable"');
                 rowTemplate = rowTemplate.replace('</angular-table>', '</div>');
                 tElement.replaceWith(rowTemplate);
 

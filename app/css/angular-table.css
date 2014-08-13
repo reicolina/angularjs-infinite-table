@@ -66,3 +66,9 @@
     display: inline-block;
     vertical-align: middle;
 }
+
+.angularTable {
+  width:800px;
+  height:400px;
+  overflow:auto;
+}
